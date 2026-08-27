@@ -1,0 +1,13 @@
+{
+  "model": "logistic-regression",
+  "split": "test",
+  "n": 2183,
+  "macro_f1": 0.8057,
+  "weighted_f1": 0.8335,
+  "balanced_accuracy": 0.8501,
+  "accuracy": 0.8259,
+  "mcc": 0.6406,
+  "cohen_kappa": 0.6176,
+  "roc_auc": 0.9204,
+  "pr_auc": 0.9676
+}

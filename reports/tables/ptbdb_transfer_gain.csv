@@ -1,0 +1,4 @@
+arm,metric,value,delta_vs_scratch,relative_error_reduction,epochs,trainable_parameters
+scratch,macro_f1,0.9841,0.0,0.0,38,53858
+frozen,macro_f1,0.9285,-0.0556,-3.4969,49,2146
+finetune,macro_f1,0.9841,0.0,0.0,44,53858

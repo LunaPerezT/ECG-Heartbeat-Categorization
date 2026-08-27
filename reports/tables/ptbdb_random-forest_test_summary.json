@@ -1,0 +1,13 @@
+{
+  "model": "random-forest",
+  "split": "test",
+  "n": 2183,
+  "macro_f1": 0.9361,
+  "weighted_f1": 0.948,
+  "balanced_accuracy": 0.9483,
+  "accuracy": 0.9473,
+  "mcc": 0.874,
+  "cohen_kappa": 0.8723,
+  "roc_auc": 0.9905,
+  "pr_auc": 0.9964
+}

@@ -1,0 +1,13 @@
+{
+  "model": "cnn-finetune",
+  "split": "test",
+  "n": 2183,
+  "macro_f1": 0.9841,
+  "weighted_f1": 0.9872,
+  "balanced_accuracy": 0.9866,
+  "accuracy": 0.9872,
+  "mcc": 0.9683,
+  "cohen_kappa": 0.9682,
+  "roc_auc": 0.9985,
+  "pr_auc": 0.9994
+}

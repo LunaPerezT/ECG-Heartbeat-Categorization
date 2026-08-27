@@ -1,0 +1,13 @@
+{
+  "model": "cnn-frozen",
+  "split": "test",
+  "n": 2183,
+  "macro_f1": 0.9285,
+  "weighted_f1": 0.9415,
+  "balanced_accuracy": 0.9451,
+  "accuracy": 0.9404,
+  "mcc": 0.8602,
+  "cohen_kappa": 0.8572,
+  "roc_auc": 0.9827,
+  "pr_auc": 0.9931
+}

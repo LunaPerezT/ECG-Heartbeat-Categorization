@@ -1,0 +1,11 @@
+{
+  "model": "majority-class",
+  "split": "test",
+  "n": 2183,
+  "macro_f1": 0.4193,
+  "weighted_f1": 0.6054,
+  "balanced_accuracy": 0.5,
+  "accuracy": 0.7219,
+  "mcc": 0.0,
+  "cohen_kappa": 0.0
+}

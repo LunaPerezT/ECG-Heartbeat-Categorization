@@ -1,0 +1,5 @@
+model,split,n,macro_f1,weighted_f1,balanced_accuracy,accuracy,mcc,cohen_kappa,roc_auc,pr_auc,fit_seconds,description
+random-forest,test,2183,0.9361,0.948,0.9483,0.9473,0.874,0.8723,0.9905,0.9964,20.9,"120 trees, depth 12, sqrt feature subsampling, class-weighted"
+gradient-boosted-trees,test,2183,0.9119,0.9272,0.9366,0.9253,0.8311,0.8244,,,13.6,"Gradient-boosted trees, one-vs-rest for the 5-class task"
+linear-svc,test,2183,0.8102,0.8381,0.852,0.831,0.6464,0.6258,,,10.1,"Linear SVM, one-vs-rest for the 5-class task, class-weighted"
+logistic-regression,test,2183,0.8057,0.8335,0.8501,0.8259,0.6406,0.6176,0.9204,0.9676,11.3,"Multinomial logistic regression, L2, class-weighted"

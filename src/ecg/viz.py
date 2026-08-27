@@ -677,3 +677,441 @@ def plot_correlation_heatmap(
         "Diverging scale · every cell labelled, so the reading never depends on colour alone",
     )
     return fig
+
+
+# ------------------------------------------------------------------ modelling
+
+#: Sequential blue ramp (100 → 700) used for magnitude encodings.
+SEQUENTIAL_BLUE = LinearSegmentedColormap.from_list(
+    "ecg_sequential",
+    ["#f4f8fe", "#cde2fb", "#9ec5f4", "#6da7ec", "#3987e5", "#256abf", "#184f95", "#0d366b"],
+)
+
+#: Fixed hues for the three per-class metrics; the first three slots are the ones
+#: that clear the all-pairs colour-vision gates.
+METRIC_COLORS: Dict[str, str] = {
+    "precision": CATEGORICAL[0],
+    "recall": CATEGORICAL[1],
+    "f1": CATEGORICAL[2],
+}
+
+
+def plot_confusion_matrix(
+    matrix: pd.DataFrame,
+    title: str = "Confusion matrix",
+    subtitle: str = "",
+    normalised: bool = False,
+    figsize: Optional[tuple] = None,
+) -> Figure:
+    """Heatmap of a confusion matrix, every cell labelled.
+
+    Magnitude is a sequential encoding, so a single hue runs light to dark — never
+    a rainbow. Cell values are always printed, so the reading never depends on
+    colour, and the diagonal is what the eye should follow.
+
+    Args:
+        matrix: Output of :func:`ecg.metrics.confusion_matrix`, true classes on the
+            index and predicted classes on the columns.
+        title: Chart title.
+        subtitle: Line under the title.
+        normalised: ``True`` when the matrix holds row-wise shares rather than
+            counts, which switches the cell format to percentages.
+        figsize: Figure size in inches; scaled to the class count when omitted.
+
+    Returns:
+        The figure.
+    """
+    labels = list(matrix.columns)
+    values = matrix.to_numpy(dtype=float)
+    size = len(labels)
+    figsize = figsize or (1.9 + 0.85 * size, 1.7 + 0.85 * size)
+
+    fig, ax = plt.subplots(figsize=figsize)
+    vmax = 1.0 if normalised else values.max()
+    image = ax.imshow(values, cmap=SEQUENTIAL_BLUE, vmin=0.0, vmax=vmax)
+
+    for i in range(size):
+        for j in range(size):
+            value = values[i, j]
+            text = f"{value * 100:.1f}%" if normalised else f"{int(value):,}"
+            ax.text(
+                j,
+                i,
+                text,
+                ha="center",
+                va="center",
+                fontsize=9,
+                fontweight="600" if i == j else "normal",
+                color=SURFACE if value > vmax * 0.55 else TEXT_SECONDARY,
+            )
+
+    ax.set_xticks(np.arange(size), labels)
+    ax.set_yticks(np.arange(size), labels)
+    ax.set_xticks(np.arange(size + 1) - 0.5, minor=True)
+    ax.set_yticks(np.arange(size + 1) - 0.5, minor=True)
+    ax.grid(which="minor", color=SURFACE, linewidth=2.0)
+    ax.grid(which="major", visible=False)
+    ax.tick_params(which="minor", length=0)
+    ax.set_xlabel("Predicted class")
+    ax.set_ylabel("True class")
+
+    bar = fig.colorbar(image, ax=ax, shrink=0.7, pad=0.03)
+    bar.outline.set_visible(False)
+    bar.ax.tick_params(labelsize=8.5, color=TEXT_SECONDARY)
+    bar.set_label("Share of true class" if normalised else "Beats", fontsize=9, color=TEXT_SECONDARY)
+
+    fig.tight_layout()
+    _figure_header(
+        fig,
+        title,
+        subtitle or ("Row-normalised: each row is one true class, so the diagonal is recall"
+                     if normalised else "Counts · rows are true classes, columns predictions"),
+    )
+    return fig
+
+
+def plot_training_curves(
+    history: pd.DataFrame,
+    title: str = "Training",
+    subtitle: str = "",
+    best_epoch: Optional[int] = None,
+    figsize: tuple = (9.2, 3.4),
+) -> Figure:
+    """Two panels: losses on the left, validation macro-F1 on the right.
+
+    Two panels rather than one chart with two y-axes — a dual-axis plot invites the
+    reader to compare quantities that share no scale.
+
+    Args:
+        history: Per-epoch history from :func:`ecg.training.train`.
+        title: Chart title.
+        subtitle: Line under the title.
+        best_epoch: Epoch to mark as the selected checkpoint.
+        figsize: Figure size in inches.
+
+    Returns:
+        The figure.
+    """
+    fig, axes = plt.subplots(1, 2, figsize=figsize)
+
+    axes[0].plot(history["epoch"], history["train_loss"], color=CATEGORICAL[0], label="train")
+    axes[0].plot(history["epoch"], history["val_loss"], color=CATEGORICAL[1], label="validation")
+    axes[0].set_ylabel("Cross-entropy loss")
+    axes[0].legend(loc="upper right")
+
+    axes[1].plot(history["epoch"], history["val_macro_f1"], color=CATEGORICAL[2])
+    axes[1].set_ylabel("Validation macro-F1")
+
+    if best_epoch is not None:
+        for ax in axes:
+            ax.axvline(best_epoch, color=REFERENCE, linewidth=1.0, zorder=0)
+        row = history[history["epoch"] == best_epoch]
+        if not row.empty:
+            value = float(row["val_macro_f1"].iloc[0])
+            axes[1].scatter([best_epoch], [value], s=42, color=CATEGORICAL[2], zorder=3)
+            axes[1].annotate(
+                f"best {value:.4f}\nepoch {best_epoch}",
+                (best_epoch, value),
+                textcoords="offset points",
+                xytext=(-8, -28),
+                ha="right",
+                fontsize=8.5,
+                color=TEXT_SECONDARY,
+            )
+
+    for ax in axes:
+        ax.set_xlabel("Epoch")
+        ax.grid(axis="x", visible=False)
+
+    fig.tight_layout()
+    _figure_header(fig, title, subtitle or "Checkpoint selected on validation macro-F1")
+    return fig
+
+
+def plot_per_class_metrics(
+    per_class: pd.DataFrame,
+    order: Optional[Sequence[str]] = None,
+    title: str = "Per-class performance",
+    subtitle: str = "",
+    figsize: Optional[tuple] = None,
+) -> Figure:
+    """Grouped bars of precision, recall and F1 for each class.
+
+    Args:
+        per_class: Output of :func:`ecg.metrics.per_class_report`; the average rows
+            are dropped.
+        order: Class order.
+        title: Chart title.
+        subtitle: Line under the title.
+        figsize: Figure size in inches; scaled to the class count when omitted.
+
+    Returns:
+        The figure.
+    """
+    data = per_class[~per_class["class"].str.contains("avg")].copy()
+    order = list(order) if order is not None else list(data["class"])
+    data = data.set_index("class").reindex(order).reset_index()
+
+    figsize = figsize or (2.4 + 1.35 * len(order), 4.0)
+    fig, ax = plt.subplots(figsize=figsize)
+
+    metric_names = ["precision", "recall", "f1"]
+    width = 0.26
+    positions = np.arange(len(order))
+
+    for index, metric in enumerate(metric_names):
+        offset = (index - 1) * (width + 0.015)
+        bars = ax.bar(
+            positions + offset,
+            data[metric],
+            width=width,
+            color=METRIC_COLORS[metric],
+            label=metric,
+        )
+        for bar, value in zip(bars, data[metric]):
+            ax.text(
+                bar.get_x() + bar.get_width() / 2,
+                bar.get_height() + 0.015,
+                f"{value:.2f}".lstrip("0"),
+                ha="center",
+                va="bottom",
+                fontsize=8,
+                color=TEXT_SECONDARY,
+            )
+
+    ax.set_xticks(
+        positions,
+        [f"{name}\nn={int(support):,}" for name, support in zip(order, data["support"])],
+    )
+    ax.set_ylim(0, 1.12)
+    ax.grid(axis="x", visible=False)
+    ax.legend(loc="lower right", ncol=3)
+    _finish(ax, ylabel="Score")
+
+    fig.tight_layout()
+    _figure_header(fig, title, subtitle or "Support shown under each class")
+    return fig
+
+
+def plot_model_comparison(
+    table: pd.DataFrame,
+    metric: str = "macro_f1",
+    label_col: str = "model",
+    title: str = "Model comparison",
+    subtitle: str = "",
+    reference: Optional[float] = None,
+    reference_label: str = "majority class",
+    figsize: Optional[tuple] = None,
+) -> Figure:
+    """Horizontal bars ranking models on one metric, values labelled.
+
+    Args:
+        table: Output of :func:`ecg.metrics.comparison_table`.
+        metric: Column to rank on.
+        label_col: Column holding the model names.
+        title: Chart title.
+        subtitle: Line under the title.
+        reference: Optional vertical reference line, e.g. a trivial baseline.
+        reference_label: Label for that line.
+        figsize: Figure size in inches; scaled to the row count when omitted.
+
+    Returns:
+        The figure.
+    """
+    data = table.sort_values(metric, ascending=True).reset_index(drop=True)
+    figsize = figsize or (8.0, 1.6 + 0.46 * len(data))
+    fig, ax = plt.subplots(figsize=figsize)
+
+    positions = np.arange(len(data))
+    best = data[metric].max()
+    colors = [
+        CATEGORICAL[0] if value >= best - 1e-12 else REFERENCE for value in data[metric]
+    ]
+    ax.barh(positions, data[metric], height=0.6, color=colors)
+
+    for y, value in zip(positions, data[metric]):
+        ax.text(
+            value + 0.012,
+            y,
+            f"{value:.4f}",
+            va="center",
+            ha="left",
+            fontsize=9,
+            color=TEXT_SECONDARY,
+        )
+
+    if reference is not None:
+        ax.axvline(reference, color=CATEGORICAL[1], linewidth=1.4, linestyle=(0, (4, 3)))
+        ax.text(
+            reference,
+            len(data) - 0.35,
+            f"  {reference_label} ({reference:.3f})",
+            color=CATEGORICAL[1],
+            fontsize=8.5,
+            va="center",
+        )
+
+    ax.set_yticks(positions, list(data[label_col]))
+    ax.set_xlim(0, min(1.0, max(best, reference or 0) * 1.28))
+    ax.grid(axis="y", visible=False)
+    _finish(ax, xlabel=metric.replace("_", " "))
+
+    fig.tight_layout()
+    _figure_header(fig, title, subtitle or "Higher is better · best model highlighted")
+    return fig
+
+
+def plot_error_examples(
+    signals: np.ndarray,
+    y_true: np.ndarray,
+    y_pred: np.ndarray,
+    label_names: Sequence[str],
+    source: str,
+    confusions: Optional[Sequence[tuple]] = None,
+    n_examples: int = 3,
+    seed: int = 42,
+    figsize_per_panel: tuple = (2.6, 1.7),
+) -> Figure:
+    """Grid of misclassified beats, one row per confusion pair.
+
+    Reading the actual waveforms a model got wrong is usually more informative
+    than another aggregate: it shows whether the errors are borderline morphology
+    or something the model should obviously have caught.
+
+    Args:
+        signals: Waveforms, shape ``(n, 187)``.
+        y_true: Ground-truth labels.
+        y_pred: Predicted labels.
+        label_names: Class names, indexed by numeric label.
+        source: Collection, for the colour assignment.
+        confusions: ``(true, predicted)`` index pairs to show; defaults to the
+            most frequent off-diagonal cells.
+        n_examples: Beats per row.
+        seed: Sampling seed.
+        figsize_per_panel: Size of each panel, in inches.
+
+    Returns:
+        The figure.
+    """
+    rng = np.random.default_rng(seed)
+    errors = y_true != y_pred
+
+    if confusions is None:
+        pairs, counts = np.unique(
+            np.stack([y_true[errors], y_pred[errors]], axis=1), axis=0, return_counts=True
+        )
+        confusions = [tuple(pair) for pair in pairs[np.argsort(-counts)][:4]]
+
+    n_rows = len(confusions)
+    fig, axes = plt.subplots(
+        n_rows,
+        n_examples,
+        figsize=(figsize_per_panel[0] * n_examples, figsize_per_panel[1] * n_rows),
+        sharex=True,
+        sharey=True,
+        squeeze=False,
+    )
+
+    for row, (true_label, pred_label) in enumerate(confusions):
+        mask = (y_true == true_label) & (y_pred == pred_label)
+        indices = np.flatnonzero(mask)
+        if len(indices) > n_examples:
+            indices = rng.choice(indices, n_examples, replace=False)
+
+        true_name, pred_name = label_names[int(true_label)], label_names[int(pred_label)]
+        for col in range(n_examples):
+            ax = axes[row][col]
+            if col < len(indices):
+                signal = signals[indices[col]]
+                length = int(np.max(np.nonzero(signal)[0]) + 1) if signal.any() else len(signal)
+                ax.plot(
+                    np.arange(length) / 125.0,
+                    signal[:length],
+                    color=class_color(source, true_name),
+                    linewidth=1.3,
+                )
+            ax.set_ylim(-0.05, 1.05)
+            ax.grid(visible=False)
+            ax.tick_params(labelsize=8)
+            if col == 0:
+                ax.set_ylabel(
+                    f"{true_name} → {pred_name}\n({int(mask.sum())} beats)",
+                    fontsize=9,
+                    color=TEXT_SECONDARY,
+                    rotation=0,
+                    ha="right",
+                    va="center",
+                    labelpad=42,
+                )
+            if row == n_rows - 1:
+                ax.set_xlabel("Time (s)", fontsize=8.5)
+
+    fig.tight_layout()
+    _figure_header(
+        fig,
+        f"Misclassified beats — {source}",
+        "Most frequent confusions · label reads true class → predicted class",
+    )
+    return fig
+
+
+def plot_low_data_curve(
+    curve: pd.DataFrame,
+    arms: Optional[Sequence[str]] = None,
+    metric: str = "macro_f1",
+    title: str = "Transfer under a shrinking target dataset",
+    subtitle: str = "",
+    figsize: tuple = (8.4, 4.4),
+) -> Figure:
+    """One line per transfer arm as the target training set shrinks.
+
+    Three series, so the three leading hues are used — the only slots that clear
+    the all-pairs colour-vision gates — and each line is direct-labelled at its
+    right end so identity never rests on colour alone.
+
+    Args:
+        curve: Output of :func:`ecg.transfer.low_data_curve`.
+        arms: Arm order; defaults to the order found in the data.
+        metric: Column to plot.
+        title: Chart title.
+        subtitle: Line under the title.
+        figsize: Figure size in inches.
+
+    Returns:
+        The figure.
+    """
+    arms = list(arms) if arms is not None else list(dict.fromkeys(curve["arm"]))
+    fig, ax = plt.subplots(figsize=figsize)
+
+    for index, arm in enumerate(arms):
+        chunk = curve[curve["arm"] == arm].sort_values("n_train")
+        color = CATEGORICAL[index % 3]
+        ax.plot(chunk["n_train"], chunk[metric], color=color, marker="o", markersize=5, label=arm)
+        last = chunk.iloc[-1]
+        ax.annotate(
+            arm,
+            (last["n_train"], last[metric]),
+            textcoords="offset points",
+            xytext=(8, 0),
+            va="center",
+            fontsize=9.5,
+            fontweight="600",
+            color=color,
+        )
+
+    ax.set_xscale("log")
+    ax.set_xticks(sorted(curve["n_train"].unique()))
+    ax.get_xaxis().set_major_formatter(mpl.ticker.FuncFormatter(lambda v, _: f"{int(v):,}"))
+    ax.tick_params(axis="x", labelrotation=0, labelsize=8.5)
+    ax.set_xlim(curve["n_train"].min() * 0.85, curve["n_train"].max() * 1.9)
+    ax.grid(axis="x", visible=False)
+    ax.legend(loc="lower right")
+    _finish(ax, xlabel="PTB training beats (log scale)", ylabel=metric.replace("_", " "))
+
+    fig.tight_layout()
+    _figure_header(
+        fig,
+        title,
+        subtitle or "Validation and test splits held at full size; only the training set shrinks",
+    )
+    return fig

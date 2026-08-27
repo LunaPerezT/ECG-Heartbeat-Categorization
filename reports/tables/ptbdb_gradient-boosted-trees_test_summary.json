@@ -1,0 +1,11 @@
+{
+  "model": "gradient-boosted-trees",
+  "split": "test",
+  "n": 2183,
+  "macro_f1": 0.9119,
+  "weighted_f1": 0.9272,
+  "balanced_accuracy": 0.9366,
+  "accuracy": 0.9253,
+  "mcc": 0.8311,
+  "cohen_kappa": 0.8244
+}

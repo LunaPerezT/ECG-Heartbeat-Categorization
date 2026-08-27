@@ -22,3 +22,12 @@ arrow_enabled: true
 seed: 42
 val_fraction: 0.15
 plot_sample_per_class: 6
+
+# --- Deep learning (PyTorch) ---
+batch_size: 256
+learning_rate: 0.001
+weight_decay: 0.0
+max_epochs: 60
+patience: 8          # epochs without validation macro-F1 gain before stopping
+lr_patience: 3       # epochs without gain before the learning rate is halved
+torch_threads: 0     # 0 leaves PyTorch's own default

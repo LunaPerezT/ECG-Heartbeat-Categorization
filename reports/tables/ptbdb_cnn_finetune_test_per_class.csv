@@ -1,0 +1,5 @@
+class,precision,recall,f1,support
+normal,0.9692,0.9852,0.9771,607
+abnormal,0.9943,0.9879,0.9911,1576
+macro avg,0.9817,0.9866,0.9841,2183
+weighted avg,0.9873,0.9872,0.9872,2183

@@ -1,0 +1,4 @@
+model,split,n,macro_f1,weighted_f1,balanced_accuracy,accuracy,mcc,cohen_kappa,roc_auc,pr_auc,arm,trainable_parameters,epochs,training_seconds,description
+cnn-scratch,test,2183,0.9841,0.9872,0.985,0.9872,0.9681,0.9681,0.9986,0.9995,scratch,53858,38,128.5,"Random initialisation, trained on PTB only"
+cnn-finetune,test,2183,0.9841,0.9872,0.9866,0.9872,0.9683,0.9682,0.9985,0.9994,finetune,53858,44,151.3,"MIT-BIH weights, all layers trainable at a lower learning rate"
+cnn-frozen,test,2183,0.9285,0.9415,0.9451,0.9404,0.8602,0.8572,0.9827,0.9931,frozen,2146,49,61.0,"MIT-BIH backbone frozen, new classifier head trained"

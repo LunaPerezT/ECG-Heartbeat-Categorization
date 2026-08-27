@@ -1,0 +1,4 @@
+arm,mean,std,min,max,n_seeds,delta_vs_scratch,metric
+scratch,0.9854,0.0017,0.9835,0.9869,3,0.0,macro_f1
+frozen,0.9339,0.0074,0.9272,0.9418,3,-0.0515,macro_f1
+finetune,0.9835,0.004,0.9807,0.9881,3,-0.0019,macro_f1

@@ -1,0 +1,12 @@
+{
+  "model": "mitbih_cnn",
+  "split": "test",
+  "n": 21892,
+  "macro_f1": 0.9166,
+  "weighted_f1": 0.984,
+  "balanced_accuracy": 0.9258,
+  "accuracy": 0.984,
+  "mcc": 0.9475,
+  "cohen_kappa": 0.9475,
+  "roc_auc_ovr_macro": 0.9936
+}

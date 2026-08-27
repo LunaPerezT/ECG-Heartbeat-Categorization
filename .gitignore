@@ -235,3 +235,11 @@ _SUCCESS
 # Processed outputs and fitted pipelines
 *.parquet
 processed/
+
+# Model checkpoints and experiment tracking (default location is outside the repo,
+# under <data_dir>/, but these guard against a local override pointing inside it)
+models/
+mlruns/
+mlflow.db
+*.pt
+*.pth

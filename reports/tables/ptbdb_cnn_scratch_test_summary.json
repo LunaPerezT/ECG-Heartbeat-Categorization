@@ -1,0 +1,13 @@
+{
+  "model": "cnn-scratch",
+  "split": "test",
+  "n": 2183,
+  "macro_f1": 0.9841,
+  "weighted_f1": 0.9872,
+  "balanced_accuracy": 0.985,
+  "accuracy": 0.9872,
+  "mcc": 0.9681,
+  "cohen_kappa": 0.9681,
+  "roc_auc": 0.9986,
+  "pr_auc": 0.9995
+}

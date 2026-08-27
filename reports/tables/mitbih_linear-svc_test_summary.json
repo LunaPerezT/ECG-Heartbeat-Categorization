@@ -1,0 +1,11 @@
+{
+  "model": "linear-svc",
+  "split": "test",
+  "n": 21892,
+  "macro_f1": 0.4876,
+  "weighted_f1": 0.7315,
+  "balanced_accuracy": 0.7908,
+  "accuracy": 0.6623,
+  "mcc": 0.4536,
+  "cohen_kappa": 0.3761
+}

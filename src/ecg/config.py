@@ -63,6 +63,8 @@ class Config:
     data_dir: Path = field(default_factory=lambda: REPO_ROOT.parent / "data")
     processed_dir: Optional[Path] = None
     reports_dir: Path = field(default_factory=lambda: REPO_ROOT / "reports")
+    models_dir: Optional[Path] = None
+    mlflow_dir: Optional[Path] = None
 
     spark_master: str = "local[*]"
     driver_memory: str = "4g"
@@ -73,6 +75,15 @@ class Config:
     val_fraction: float = 0.15
     plot_sample_per_class: int = 6
 
+    # --- deep learning ---
+    batch_size: int = 256
+    learning_rate: float = 1e-3
+    weight_decay: float = 0.0
+    max_epochs: int = 60
+    patience: int = 8
+    lr_patience: int = 3
+    torch_threads: int = 0  # 0 = leave PyTorch's default
+
     def __post_init__(self) -> None:
         self.data_dir = Path(self.data_dir)
         self.reports_dir = Path(self.reports_dir)
@@ -80,6 +91,12 @@ class Config:
             Path(self.processed_dir)
             if self.processed_dir is not None
             else self.data_dir / "processed"
+        )
+        self.models_dir = (
+            Path(self.models_dir) if self.models_dir is not None else self.data_dir / "models"
+        )
+        self.mlflow_dir = (
+            Path(self.mlflow_dir) if self.mlflow_dir is not None else self.data_dir / "mlruns"
         )
 
     # ------------------------------------------------------------------ paths
@@ -122,9 +139,18 @@ class Config:
         """Return the Parquet destination for a named dataset stage."""
         return self.processed_dir / name
 
+    def model_path(self, name: str) -> Path:
+        """Return the checkpoint path for a named model."""
+        return Path(self.models_dir) / name
+
     def ensure_dirs(self) -> "Config":
         """Create the output directories if they do not exist yet."""
-        for directory in (self.processed_dir, self.figures_dir, self.tables_dir):
+        for directory in (
+            self.processed_dir,
+            self.figures_dir,
+            self.tables_dir,
+            self.models_dir,
+        ):
             Path(directory).mkdir(parents=True, exist_ok=True)
         return self
 
