@@ -1,0 +1,6 @@
+source,label_name,n_beats,min_length,median_length,max_length,mean_length,mean_duration_s,pct_unpadded,pct_ambiguous_tail
+mitbih,F,803,29,78,187,78.5,0.6277,0.12,17.31
+mitbih,N,90589,10,106,187,110.8,0.8861,0.44,2.82
+mitbih,Q,8039,31,120,183,118.3,0.9466,0.0,1.17
+mitbih,S,2779,22,107,187,114.2,0.9133,11.69,0.79
+mitbih,V,7236,14,113,187,117.9,0.9432,3.48,0.84

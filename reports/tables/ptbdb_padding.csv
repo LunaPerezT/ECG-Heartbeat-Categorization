@@ -1,0 +1,3 @@
+source,label_name,n_beats,min_length,median_length,max_length,mean_length,mean_duration_s,pct_unpadded,pct_ambiguous_tail
+ptbdb,abnormal,10506,51,110,186,112.6,0.9012,0.0,1.44
+ptbdb,normal,4046,62,130,186,130.4,1.0435,0.0,0.15

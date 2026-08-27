@@ -216,3 +216,22 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# --- ECG Heartbeat Categorization ---------------------------------------------
+# Raw dataset (583 MB of CSV) and everything derived from it. The default data
+# directory is the `data/` folder next to this repository; these patterns also
+# cover the cookiecutter-style layout in case the CSVs are placed inside it.
+data/
+*.csv
+!reports/tables/*.csv
+
+# Spark local artefacts
+spark-warehouse/
+metastore_db/
+derby.log
+*.crc
+_SUCCESS
+
+# Processed outputs and fitted pipelines
+*.parquet
+processed/

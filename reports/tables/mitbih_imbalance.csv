@@ -1,0 +1,2 @@
+source,n_beats,n_classes,majority_class,majority_pct,minority_class,minority_pct,imbalance_ratio
+mitbih,109446,5,N,82.77,F,0.73,112.8

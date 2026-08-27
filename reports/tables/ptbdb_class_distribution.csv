@@ -1,0 +1,3 @@
+source,split,label,label_name,n_beats,pct,description
+ptbdb,full,0,normal,4046,27.804,Healthy control recording
+ptbdb,full,1,abnormal,10506,72.196,Recording from a patient diagnosed with myocardial infarction

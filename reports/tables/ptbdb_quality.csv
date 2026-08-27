@@ -1,0 +1,12 @@
+check,n_beats,pct
+rows_total,14552,100.0
+null_signal,0,0.0
+wrong_length,0,0.0
+null_label,0,0.0
+contains_null_sample,0,0.0
+contains_nan_sample,0,0.0
+below_zero,0,0.0
+above_one,0,0.0
+all_zero_beat,0,0.0
+max_not_one,0,0.0
+min_not_zero,0,0.0

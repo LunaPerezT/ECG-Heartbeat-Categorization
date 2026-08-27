@@ -1,0 +1,24 @@
+# Project configuration.
+#
+# Every key here maps to a field of `ecg.config.Config` and can be overridden by
+# an environment variable (ECG_DATA_DIR, ECG_PROCESSED_DIR, ECG_REPORTS_DIR,
+# ECG_SPARK_MASTER, ECG_DRIVER_MEMORY, ECG_SHUFFLE_PARTITIONS, ECG_SEED) or by a
+# keyword argument to `load_config()`.
+#
+# `data_dir` is intentionally left commented out: the default is the `data/`
+# folder sitting next to the repository, which keeps 583 MB of CSV out of git.
+# Uncomment and edit it if your CSVs live somewhere else.
+
+# data_dir: /absolute/path/to/heartbeat
+# processed_dir: /absolute/path/to/heartbeat/processed
+
+# --- Spark (ignored on Databricks, where the cluster owns the configuration) ---
+spark_master: "local[*]"
+driver_memory: "4g"
+shuffle_partitions: 16
+arrow_enabled: true
+
+# --- Analysis ---
+seed: 42
+val_fraction: 0.15
+plot_sample_per_class: 6

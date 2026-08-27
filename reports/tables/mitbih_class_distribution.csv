@@ -1,0 +1,11 @@
+source,split,label,label_name,n_beats,pct,description
+mitbih,test,0,N,18118,82.761,"Normal beat (normal, left/right bundle branch block, atrial escape, nodal escape)"
+mitbih,test,1,S,556,2.54,"Supraventricular ectopic beat (atrial premature, aberrant atrial, nodal, supraventricular)"
+mitbih,test,2,V,1448,6.614,"Ventricular ectopic beat (premature ventricular contraction, ventricular escape)"
+mitbih,test,3,F,162,0.74,Fusion beat (fusion of ventricular and normal)
+mitbih,test,4,Q,1608,7.345,"Unknown / unclassifiable beat (paced, fusion of paced and normal, unclassified)"
+mitbih,train,0,N,72471,82.773,"Normal beat (normal, left/right bundle branch block, atrial escape, nodal escape)"
+mitbih,train,1,S,2223,2.539,"Supraventricular ectopic beat (atrial premature, aberrant atrial, nodal, supraventricular)"
+mitbih,train,2,V,5788,6.611,"Ventricular ectopic beat (premature ventricular contraction, ventricular escape)"
+mitbih,train,3,F,641,0.732,Fusion beat (fusion of ventricular and normal)
+mitbih,train,4,Q,6431,7.345,"Unknown / unclassifiable beat (paced, fusion of paced and normal, unclassified)"

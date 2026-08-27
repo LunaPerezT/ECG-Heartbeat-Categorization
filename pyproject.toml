@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ecg-heartbeat-categorization"
+version = "0.1.0"
+description = "PySpark ingestion, EDA and preprocessing pipeline for the ECG Heartbeat Categorization dataset"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
+authors = [{ name = "Luna Pérez Troncoso" }]
+keywords = ["ecg", "arrhythmia", "pyspark", "databricks", "eda", "mit-bih", "ptb"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+    "Intended Audience :: Science/Research",
+]
+dependencies = [
+    "pyspark>=3.5,<5.0",
+    "pandas>=2.0",
+    "numpy>=1.24",
+    "matplotlib>=3.7",
+    "pyarrow>=12.0",
+    "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.4", "jupyterlab>=4.0", "ipykernel>=6.25"]
+
+[project.urls]
+Repository = "https://github.com/LunaPerezT/ECG-Heartbeat-Categorization"
+Dataset = "https://www.kaggle.com/datasets/shayanfazeli/heartbeat"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = ["ignore::DeprecationWarning"]

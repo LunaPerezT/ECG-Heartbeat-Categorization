@@ -1,0 +1,2 @@
+source,n_beats,n_classes,majority_class,majority_pct,minority_class,minority_pct,imbalance_ratio
+ptbdb,14552,2,abnormal,72.2,normal,27.8,2.6
